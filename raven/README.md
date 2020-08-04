@@ -33,7 +33,7 @@ You&#39;ll need the following tools in your development environment:
 - [docker](https://docs.docker.com/install/)
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [openssl](https://www.openssl.org/)
-- h[elm](https://helm.sh/)
+- [helm](https://helm.sh/)
 
 ### **DEPLOYMENTS**
 
@@ -59,11 +59,11 @@ gcloud container clusters get-credentials &quot;${CLUSTER}&quot; --zone &quot;${
 
 Clone this repo, as well as its associated tools repo:
 
-git clone --recursive https://github.com/datametica/raven-gke-deploy.git
+git clone --recursive https://github.com/datametica/GCPMarketplace.git
 
 **Install the Raven app**
 
-cd raven-gke-deploy
+cd GCPMarketplace/raven
 
 Configure the variables from values.yml such as namespace, image, image tag, ingress settings, persistence disk size, gcs bucket name and access secrets, wildcard certificates for ssl enablement and execute below command
 
