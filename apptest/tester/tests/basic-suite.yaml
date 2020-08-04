@@ -1,0 +1,19 @@
+actions:
+  - name: Raven login with correct credentials
+    bashTest:
+      script: |-
+        curl -X POST 'https://${EXTERNAL-IP}:8443/api/raven/web/login' --header 'Content-Type: application/json' --data-raw '{"username": "YWRtaW4=","password": "QWRtaW4kMzIxIQ=="}'
+      expect:
+        stdout:
+          matches: true
+          exitCode:
+            equals: 0
+  - name: Raven login with incorrect credentials
+    bashTest:
+      script: |-
+        curl -X POST 'https://${EXTERNAL-IP}:8443/api/raven/web/login' --header 'Content-Type: application/json' --data-raw '{"username": "YWRtaW4=","password": "QWRtaW4kMzIxIQ=="}'
+      expect:
+        stdout:
+          matches: false
+          exitCode:
+            equals: 0

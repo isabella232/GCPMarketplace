@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-db
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/component: raven-db
+spec:
+  serviceName: {{ .Release.Name }}-db-service
+  replicas: {{ .Values.postgresql.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: raven-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: raven-db
+    spec:
+      containers:
+        - name: raven-db
+          image:  "{{ .Values.postgresql.image.repo }}:{{ .Values.postgresql.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.postgresql.port }}
+              name: postgredb
+          volumeMounts:
+            - name: {{ .Release.Name }}-data
+              mountPath: /var/lib/postgresql/data
+              subPath: data
+      volumes:
+      - name: {{ .Release.Name }}-data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-data
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Release.Name }}-data
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/component: raven-db
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.postgresql.persistence.size }}

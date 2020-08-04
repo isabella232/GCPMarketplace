@@ -1,0 +1,53 @@
+x-google-marketplace:
+  schemaVersion: v2
+  applicationApiVersion: v1beta1
+  publishedVersion: '$TAG'
+  publishedVersionMetadata:
+    releaseNote: >-
+      Initial release of Raven-web.
+    releaseTypes:
+      - Feature
+    recommended: true
+  images:
+    '':
+      properties:
+        raven.image.repo:
+          type: REPO_WITH_REGISTRY
+        raven.image.tag:
+          type: TAG
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  raven.storage.bucket:
+    type: string
+    title: Bucket name
+    description: Bucket name for storage of input files and other data.
+  postgresql.persistence.size:
+    type: string
+    title: Storage size for Postgresql!
+    default: "60Gi"
+    description: The storage size (GB) for the postgresql! persistent volume
+    pattern: '^[1-9][0-9]*(\.[0-9]+)?[TGM]i?$'
+  certificate:
+    type: string
+    x-google-marketplace:
+      type: TLS_CERTIFICATE
+      tlsCertificate:
+        generatedProperties:
+          base64EncodedPrivateKey: tls.base64EncodedPrivateKey
+          base64EncodedCertificate: tls.base64EncodedCertificate
+  reporting_secret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
+required:
+  - name
+  - namespace
+  - raven.storage.bucket
+  - postgresql.persistence.size

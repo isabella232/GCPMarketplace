@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-web
+  labels: 
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/component: raven-web
+    app: raven-web
+spec:
+  replicas: {{ .Values.raven.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/component: raven-web
+      app: raven-web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/component: raven-web
+        app: raven-web
+    spec:
+      containers:
+        - name: ubbagent
+          image: "{{ .Values.ubb.image.repo }}:{{ .Values.ubb.image.tag }}"
+          imagePullPolicy: Always
+          env:
+          - name: AGENT_CONFIG_FILE
+            value: "/usr/local/bin/disk-only.yaml"
+          - name: AGENT_STATE_DIR
+            value: "examples/"
+          - name: AGENT_LOCAL_PORT
+            value: "{{ .Values.ubb.port }}"
+          args: ["/usr/local/bin/ubbagent-start"]
+          ports:
+            - containerPort: {{ .Values.ubb.port }}
+              name: ubbagent
+          volumeMounts:
+          - name: agent-config
+            mountPath: /usr/local/bin/disk-only.yaml
+            subPath: disk-only.yaml
+        - name: raven-web
+          image: "{{ .Values.raven.image.repo }}:{{ .Values.raven.image.tag }}"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+          command: ["/bin/sh", "-c"]
+          args:
+            - gcsfuse --implicit-dirs -o nonempty {{ .Values.raven.storage.bucket }} {{ .Values.raven.storage.dir }} && java -jar raven-web.jar --spring.config.location=application.properties
+          ports:
+            - containerPort: 8443
+              name: ravenui-2
+              protocol: TCP
+            - containerPort: 8080
+              name: ravenui-1
+              protocol: TCP
+          volumeMounts:
+          {{- if .Values.raven.ssl.enabled }}
+          - mountPath: /opt/raven/server/keystore
+            name: keystore
+          {{end}}
+          - name: raven-config
+            mountPath: /opt/raven/server/application.properties
+            subPath: application.properties
+      volumes:
+      {{- if .Values.raven.ssl.enabled }}
+      - name: keystore
+        secret:
+          secretName: {{ .Release.Name }}-ssl-secrets
+      {{end}}
+      - name: raven-config
+        configMap:
+          name: {{ .Release.Name }}-raven-config
+          defaultMode: 420
+      - name: agent-config
+        configMap:
+          name: {{ .Release.Name }}-ubbagent-config
+          defaultMode: 420
+      restartPolicy: Always

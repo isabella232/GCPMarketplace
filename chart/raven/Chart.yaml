@@ -1,0 +1,8 @@
+apiVersion: v1
+name: raven
+description: Raven does SQL workload traslation.
+keywords:
+    - datametica
+    - ETL
+version: 1.0.1
+icon: https://www.datametica.com/wp-content/uploads/2020/01/raven_banner.png
