@@ -1,0 +1,19 @@
+actions:
+  - name: Pelican login with correct credentials
+    bashTest:
+      script: |-
+        curl -X POST 'http://${EXTERNAL-IP}:8080/api/raven/web/login' --header 'Content-Type: application/json' --data-raw '{"username": "null","password": "null"}'
+      expect:
+        stdout:
+          matches: true
+          exitCode:
+            equals: 0
+  - name: Pelican login with incorrect credentials
+    bashTest:
+      script: |-
+        curl -X POST 'http://${EXTERNAL-IP}:8080/api/raven/web/login' --header 'Content-Type: application/json' --data-raw '{"username": "null","password": "null"}'
+      expect:
+        stdout:
+          matches: false
+          exitCode:
+            equals: 0

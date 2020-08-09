@@ -1,0 +1,45 @@
+# Default values for pelican application
+ubb:
+  image:
+    repo: null
+    tag: null
+  port: 3456
+pelican:
+  replicas: 1
+  image:
+    repo: null
+    tag: null
+  namespace: "default"
+  service:
+    type: LoadBalancer
+    port: 8080
+    targetPort: 8080
+    loadBalancerSourceRanges:
+pelicandb:
+  replicas: 1
+  image:
+    repo: null
+    tag: null
+  port: 3306
+  service:
+    annotations: {}
+    type: ClusterIP
+    targetPort: 3306
+  mysqlPassword: null
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
+  # Need to check.
+  securityContext:
+    enabled: false
+    runAsUser: 999
+    fsGroup: 999

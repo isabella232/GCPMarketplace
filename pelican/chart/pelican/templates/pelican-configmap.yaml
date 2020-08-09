@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pelican-config
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/component: pelican-config
+data:
+  application-dev.yml: |
+    server:
+        port: 8080
+    multipart:
+        maxFileSize: 20Mb
+        maxRequestSize: 200Mb
+    spring:
+        profiles:
+            active: dev
+        datasource:
+            dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+            url: null
+            username: null
+            password: null
+            cachePrepStmts: true
+            prepStmtCacheSize: 250
+            prepStmtCacheSqlLimit: 2048
+            useServerPrepStmts: true
+        jpa:
+            database-platform: org.hibernate.dialect.MySQLInnoDBDialect
+            database: null
+            openInView: true
+            show_sql: false
+            generate-ddl: false
+            hibernate:
+                ddl-auto: none
+                naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
+            properties:
+                hibernate.cache.use_query_cache: false
+                hibernate.generate_statistics: true
+                hibernate.cache.use_minimal_puts: true
+                hibernate.cache.use_second_level_cache: true
+                hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        oauth:
+            resource_id: ecat_rest_apis
+            client_id: ecat
+            client_secret: ecat
+            access_token_validity_seconds: 28800
+            refresh_token_validity_seconds: 43200
+        scheduler:
+            thread_pool_size: 10
+        platform:
+            name: pelican
+    metrics:
+        jmx.enabled: false
+    cache:
+        timeToLiveSeconds: 3600

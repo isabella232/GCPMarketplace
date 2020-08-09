@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-ubbagent-config
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/component: ubbagent
+data:
+  disk-only.yaml: |
+    metrics:
+    - name: requests
+      type: int
+
+      endpoints:
+      - name: disk
+
+      aggregation:
+        bufferSeconds: 60
+
+    - name: instance-seconds
+      type: int
+      passthrough: {}
+      endpoints:
+      - name: disk
+
+    endpoints:
+    - name: disk
+      disk:
+        reportDir: /var/ubbagent/reports
+        expireSeconds: 3600
+
+    sources:
+    - name: instance-seconds
+      heartbeat:
+        metric: instance-seconds
+        intervalSeconds: 60
+        value:
+          int64Value: 60
+        labels:
+          auto: true

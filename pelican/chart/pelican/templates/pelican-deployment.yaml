@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-web
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/component: pelican-web
+    app: pelican-web
+spec:
+  replicas: {{ .Values.pelican.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/component: pelican-web
+      app: pelican-web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/component: pelican-web
+        app: pelican-web
+    spec:
+      containers:
+        - name: ubbagent
+          image: "{{ .Values.ubb.image.repo }}:{{ .Values.ubb.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: AGENT_CONFIG_FILE
+              value: "/usr/local/bin/disk-only.yaml"
+            - name: AGENT_STATE_DIR
+              value: "examples/"
+            - name: AGENT_LOCAL_PORT
+              value: "{{ .Values.ubb.port }}"
+          args: ["/usr/local/bin/ubbagent-start"]
+          ports:
+            - containerPort: {{ .Values.ubb.port }}
+              name: ubbagent
+          volumeMounts:
+            - name: agent-config
+              mountPath: /usr/local/bin/disk-only.yaml
+              subPath: disk-only.yaml
+        - name: pelican-web
+          image: "{{ .Values.pelican.image.repo }}:{{ .Values.pelican.image.tag }}"
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c"]
+          args:
+            - /usr/local/bin/wait_for_db.sh {{ .Release.Name }}-db-service {{ .Values.pelicandb.port }} 90 -- catalina.sh run
+          ports:
+            - containerPort: 8080
+              name: pelicanui-1
+              protocol: TCP
+            - containerPort: 9090
+              name: pelicanui-2
+              protocol: TCP
+          volumeMounts:
+          - name: pelican-config
+            mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/config/application-dev.yml
+            subPath: application-dev.yml
+      volumes:
+      - name: pelican-config
+        configMap:
+          name: {{ .Release.Name }}-pelican-config
+          defaultMode: 420
+      - name: agent-config
+        configMap:
+          name: {{ .Release.Name }}-ubbagent-config
+          defaultMode: 420

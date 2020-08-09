@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pelican-db-config
+data:
+  pelican_db_init.sh: |
+    #!/bin/bash
+
+    USER=null
+    PASSWD=null
+    DBNAME='ecat_pelican_db'
+    HOST='localhost'
+    DBDUMP='/ecat_pelican_db.sql'
+
+    # check if user already exists
+    STATUS="$(mysql -uroot -p${MYSQL_ROOT_PASSWORD} -sse "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '${USER}')")"
+    if [ "${STATUS}" == 1 ]; then
+      echo "DB User: ${USER}  already exists"
+    else
+      echo "creating pelican db user"
+      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER '${USER}'@'%' IDENTIFIED BY '${PASSWD}'" 2>/dev/null
+      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL PRIVILEGES ON *.* TO '${USER}'@'%'" 2>/dev/null
+      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "FLUSH PRIVILEGES" 2>/dev/null
+    fi
+
+    # create database
+    RESULT="$(mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SHOW DATABASES" 2>/dev/null)"
+    if [[ "${RESULT}" =~ "ecat_pelican_db" ]]; then
+      echo "db already exists"
+    else
+      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE ${DBNAME}" 2>/dev/null
+      mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${DBNAME} < ${DBDUMP} 2>/dev/null
+    fi
+
+    echo "Starting DB..."
