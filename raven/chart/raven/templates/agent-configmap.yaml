@@ -7,34 +7,39 @@ metadata:
     app.kubernetes.io/component: ubbagent
 data:
   disk-only.yaml: |
+    name: null
+    title: null
+    producer_project_id: null
+    identities:
+    - name: gcp
+      gcp:
+        encodedServiceAccountKey: $AGENT_ENCODED_KEY
+    control:
+      environment: null
     metrics:
-    - name: requests
+    - name: null
+      metric_kind: null
+      value_type: null
       type: int
-
+      unit: 1
       endpoints:
-      - name: disk
-
-      aggregation:
-        bufferSeconds: 60
-
-    - name: instance-seconds
-      type: int
+      - name: null
+      - name: null
       passthrough: {}
-      endpoints:
-      - name: disk
-
     endpoints:
-    - name: disk
+    - name: null
       disk:
         reportDir: /var/ubbagent/reports
         expireSeconds: 3600
-
-    sources:
-    - name: instance-seconds
-      heartbeat:
-        metric: instance-seconds
-        intervalSeconds: 60
-        value:
-          int64Value: 60
-        labels:
-          auto: true
+    - name: null
+      servicecontrol:
+        identity: null
+        serviceName: null
+        consumerId: $AGENT_CONSUMER_ID
+    billing:
+      metrics:
+      - null
+      rules:
+      - selector: "*"
+        allowed_statuses:
+        - current

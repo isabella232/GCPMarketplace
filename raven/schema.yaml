@@ -1,19 +1,38 @@
 x-google-marketplace:
   schemaVersion: v2
   applicationApiVersion: v1beta1
-  publishedVersion: '$TAG'
+  publishedVersion: "$TAG"
   publishedVersionMetadata:
     releaseNote: >-
       Initial release of Raven-web.
     releaseTypes:
       - Feature
     recommended: true
+  clusterConstraints:
+    assistedClusterCreation:
+      type: STRICT
+      gke:
+        nodePool:
+        - numNodes: 1
+          machineType: n1-standard-8
   images:
     '':
       properties:
         raven.image.repo:
           type: REPO_WITH_REGISTRY
         raven.image.tag:
+          type: TAG
+    raven-db:
+      properties:
+        ravendb.image.repo:
+          type: REPO_WITH_REGISTRY
+        ravendb.image.tag:
+          type: TAG
+    ubbagent:
+      properties:
+        ubb.image.repo:
+          type: REPO_WITH_REGISTRY
+        ubb.image.tag:
           type: TAG
 properties:
   name:
@@ -27,13 +46,23 @@ properties:
   raven.storage.bucket:
     type: string
     title: Bucket name
+    default: "raven-web-job-data"
     description: Bucket name for storage of input files and other data.
-  postgresql.persistence.size:
+  ravendb.persistence.size:
     type: string
     title: Storage size for Postgresql!
     default: "60Gi"
     description: The storage size (GB) for the postgresql! persistent volume
     pattern: '^[1-9][0-9]*(\.[0-9]+)?[TGM]i?$'
+  raven.service.loadBalancerSourceRanges:
+    type: string
+    title: Web UI Access Source IP Adress
+    description: Comma separated source IPs/CIDRs to restrict application URL access, e.g. 114.162.90.75/32,115.132.81.56/32
+    default: "0.0.0.0/0"
+  reporting-secret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
   certificate:
     type: string
     x-google-marketplace:
@@ -42,12 +71,8 @@ properties:
         generatedProperties:
           base64EncodedPrivateKey: tls.base64EncodedPrivateKey
           base64EncodedCertificate: tls.base64EncodedCertificate
-  reporting_secret:
-    type: string
-    x-google-marketplace:
-      type: REPORTING_SECRET
 required:
   - name
   - namespace
-  - raven.storage.bucket
-  - postgresql.persistence.size
+  - ravendb.persistence.size
+  - raven.service.loadBalancerSourceRanges

@@ -7,8 +7,9 @@ metadata:
     app.kubernetes.io/component: raven-web
 spec:
   type: {{ .Values.raven.service.type }}
+  # Kubernetes allows traffic from ip's defined in loadBalancerSourceRanges
   loadBalancerSourceRanges:
-  {{- range $IP := .Values.raven.service.loadBalancerSourceRanges }}
+  {{- range $IP := (split "," .Values.raven.service.loadBalancerSourceRanges) }}
     - {{ $IP }}
   {{- end }}
   ports:

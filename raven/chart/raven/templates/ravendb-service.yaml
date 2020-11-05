@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/component: raven-db
 spec:
   ports:
-    - port: {{ .Values.postgresql.port }}
+    - port: {{ .Values.ravendb.port }}
       name: postgresql
   clusterIP: None
   selector:

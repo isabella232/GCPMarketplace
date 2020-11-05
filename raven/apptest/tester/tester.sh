@@ -1,7 +1,7 @@
 set -xeo pipefail
 shopt -s nullglob
 
-SERVICE="raven"
+SERVICE=$(kubectl get service | awk '/web-service/ { print $1 }')
 
 EXTERNAL_IP=$(kubectl get service "${SERVICE}" \
   --namespace "${NAMESPACE}" \

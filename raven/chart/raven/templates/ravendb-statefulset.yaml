@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/component: raven-db
 spec:
   serviceName: {{ .Release.Name }}-db-service
-  replicas: {{ .Values.postgresql.replicas }}
+  replicas: {{ .Values.ravendb.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/component: raven-db
@@ -18,9 +18,9 @@ spec:
     spec:
       containers:
         - name: raven-db
-          image:  "{{ .Values.postgresql.image.repo }}:{{ .Values.postgresql.image.tag }}"
+          image:  "{{ .Values.ravendb.image.repo }}:{{ .Values.ravendb.image.tag }}"
           ports:
-            - containerPort: {{ .Values.postgresql.port }}
+            - containerPort: {{ .Values.ravendb.port }}
               name: postgredb
           volumeMounts:
             - name: {{ .Release.Name }}-data
@@ -30,15 +30,3 @@ spec:
       - name: {{ .Release.Name }}-data
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-data
-  volumeClaimTemplates:
-  - metadata:
-      name: {{ .Release.Name }}-data
-      labels:
-        app.kubernetes.io/name: {{ .Release.Name }}
-        app.kubernetes.io/component: raven-db
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: {{ .Values.postgresql.persistence.size }}

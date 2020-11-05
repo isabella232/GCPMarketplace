@@ -10,7 +10,7 @@ data:
     spring.servlet.multipart.max-file-size=128MB
     spring.servlet.multipart.max-request-size=128MB
     spring.servlet.multipart.enabled=true
-    base.dir.location=/opt/raven/raven-data
+    base.dir.location=null
     data.dir.location=${base.dir.location}/data
     dictionary.dir.location=${base.dir.location}/dictionary
     dictionary.json.location=${base.dir.location}/dictionary/dictionary.json
@@ -22,21 +22,25 @@ data:
     spring.jackson.serialization.indent_output=true
     spring.jackson.serialization.write_dates_as_timestamps=false
     spring.jackson.serialization.write_durations_as_timestamps=false
-    logging.config=classpath:logback-spring.xml
-    
+    logging.config=null
+
     server.ssl.key-store-type=PKCS12
     server.ssl.key-store=classpath:keystore/keystore.p12
-    server.ssl.key-store-password=password
+    server.ssl.key-store-password=null
     server.ssl.key-alias=tomcat
     server.port=8443
 
     spring.datasource.platform=postgres
-    spring.datasource.url=jdbc:postgresql://{{ .Release.Name }}-db-service:5432/raven_marketplace
-    spring.datasource.username=postgres
-    spring.datasource.password=postgres
+    spring.datasource.url=null
+    spring.datasource.username=null
+    spring.datasource.password=null
     spring.jpa.show-sql=true
     spring.jpa.generate-ddl=true
     spring.jpa.hibernate.ddl-auto=update
     spring.datasource.initialization-mode=always
     spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+    ddl.object.filter.file.path=
+    bq.load.table=
+
 

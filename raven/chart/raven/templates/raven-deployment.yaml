@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-web
-  labels: 
+  labels:
     app.kubernetes.io/name: {{ .Release.Name }}
     app.kubernetes.io/component: raven-web
     app: raven-web
@@ -31,6 +31,16 @@ spec:
             value: "examples/"
           - name: AGENT_LOCAL_PORT
             value: "{{ .Values.ubb.port }}"
+          - name: AGENT_ENCODED_KEY
+            valueFrom:
+              secretKeyRef:
+                key: reporting-key
+                name: {{ .Release.Name }}-reporting-secret
+          - name: AGENT_CONSUMER_ID
+            valueFrom:
+              secretKeyRef:
+                key: consumer-id
+                name: {{ .Release.Name }}-reporting-secret
           args: ["/usr/local/bin/ubbagent-start"]
           ports:
             - containerPort: {{ .Values.ubb.port }}
@@ -49,7 +59,7 @@ spec:
                 - SYS_ADMIN
           command: ["/bin/sh", "-c"]
           args:
-            - gcsfuse --implicit-dirs -o nonempty {{ .Values.raven.storage.bucket }} {{ .Values.raven.storage.dir }} && java -jar raven-web.jar --spring.config.location=application.properties
+            - jre/bin/java -Xmx16384m -jar raven-web.jar --spring.config.location=application.properties
           ports:
             - containerPort: 8443
               name: ravenui-2
